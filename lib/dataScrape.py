@@ -1,10 +1,5 @@
 import requests, bs4, json
 
-startTime = time.time()
-totalStats = []
-firstName = False
-
-
 url='https://www.sports-reference.com/cfb/schools/'
 res = requests.get(url)
 html = res.content
@@ -75,6 +70,57 @@ for i in range(0,len(step2)):
                 }
                 }
         teamData.update(toAppend)
+        
+## Getting Schedule Results
+url='https://www.sports-reference.com/cfb/years/2019-schedule.html'
+res = requests.get(url)
+html = res.content
+soup = bs4.BeautifulSoup(html, 'html.parser')
+step1 = soup.find('table', attrs={'id':'schedule'})
+step2 = bs4.BeautifulSoup(str(step1.findAll('tbody')),'html.parser').findAll('tr')
+
+resultsData = {}
+
+for i in range(0,len(step2)):
+    try:
+        team1 = bs4.BeautifulSoup(str(step2[i].find('td', attrs={'data-stat':'winner_school_name'})),'html.parser').find('a').string
+    except:
+        team1 = bs4.BeautifulSoup(str(step2[i].find('td', attrs={'data-stat':'winner_school_name'})),'html.parser').string
+    team1Score = bs4.BeautifulSoup(str(step2[i].find('td', attrs={'data-stat':'winner_points'})),'html.parser').string
+    if team1Score is None:
+        print('done.')
+        break
+    
+    if bs4.BeautifulSoup(str(step2[i].find('td', attrs={'data-stat':'game_location'})),'html.parser').string == "@":
+        team1Home = False
+    else:
+        team1Home = True
+    try:
+        team2 = bs4.BeautifulSoup(str(step2[i].find('td', attrs={'data-stat':'loser_school_name'})),'html.parser').find('a').string
+    except:
+        team2 = bs4.BeautifulSoup(str(step2[i].find('td', attrs={'data-stat':'loser_school_name'})),'html.parser').string
+    team2Score = bs4.BeautifulSoup(str(step2[i].find('td', attrs={'data-stat':'loser_points'})),'html.parser').string
+    week = 'week-'+bs4.BeautifulSoup(str(step2[i].find('td', attrs={'data-stat':'week_number'})),'html.parser').string
+    results = {
+            week:
+                {
+                    'winning-team':team1,
+                    'winning-score': team1Score,
+                    'winning-team-home':team1Home,
+                    'losing-team':team2,
+                    'losing-score':team2Score
+                }
+            }
+    try:
+        teamData[team1].update(results)
+    except:
+        pass
+    try:
+        teamData[team2].update(results)
+    except:
+        pass
+    
+
     
 with open('teamData.json', 'w') as outfile:
     json.dump(teamData, outfile)

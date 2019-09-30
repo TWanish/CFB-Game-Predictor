@@ -10,9 +10,11 @@ step2 = bs4.BeautifulSoup(str(step1.findAll('tbody')),'html.parser').findAll('tr
 teamData = {}
 
 for i in range(0,len(step2)):
-    year = bs4.BeautifulSoup(str(step2[i].find('td', attrs={'data-stat':'year_max'})),'html.parser').string
+    year = bs4.BeautifulSoup(str(step2[i].find('td',
+                                 attrs={'data-stat':'year_max'})),'html.parser').string
     if year == '2019':
-        schoolLink = bs4.BeautifulSoup(str(step2[i].find('td', attrs={'data-stat':'school_name'})),'html.parser').find('a', href=True)
+        schoolLink = bs4.BeautifulSoup(str(step2[i].find('td',
+                                           attrs={'data-stat':'school_name'})),'html.parser').find('a', href=True)
         name = schoolLink.string
         link = 'https://www.sports-reference.com'+schoolLink['href']+'2019.html'
         res = requests.get(link)
@@ -40,16 +42,26 @@ for i in range(0,len(step2)):
         ## Summary Data (Off Rush yards, Pass Yards, YPP, Penalties, TO)
         step3 = soup.find('table', attrs={'id':'team'})
         step4 = bs4.BeautifulSoup(str(step3.findAll('tbody')),'html.parser').findAll('tr')
-        off_pass_yds = bs4.BeautifulSoup(str(step4[0].find('td', attrs={'data-stat':'pass_yds'})),'html.parser').string
-        off_rush_yds = bs4.BeautifulSoup(str(step4[0].find('td', attrs={'data-stat':'rush_yds'})),'html.parser').string
-        off_ypp = bs4.BeautifulSoup(str(step4[0].find('td', attrs={'data-stat':'tot_yds_per_play'})),'html.parser').string
-        off_pen_yds = bs4.BeautifulSoup(str(step4[0].find('td', attrs={'data-stat':'penalty_yds'})),'html.parser').string
-        off_turnovers = bs4.BeautifulSoup(str(step4[0].find('td', attrs={'data-stat':'turnovers'})),'html.parser').string
-        def_pass_yds = bs4.BeautifulSoup(str(step4[1].find('td', attrs={'data-stat':'opp_pass_yds'})),'html.parser').string
-        def_rush_yds = bs4.BeautifulSoup(str(step4[1].find('td', attrs={'data-stat':'opp_rush_yds'})),'html.parser').string
-        def_ypp = bs4.BeautifulSoup(str(step4[1].find('td', attrs={'data-stat':'opp_tot_yds_per_play'})),'html.parser').string
-        def_pen_yds = bs4.BeautifulSoup(str(step4[1].find('td', attrs={'data-stat':'opp_penalty_yds'})),'html.parser').string
-        def_turnovers = bs4.BeautifulSoup(str(step4[1].find('td', attrs={'data-stat':'opp_turnovers'})),'html.parser').string
+        off_pass_yds = bs4.BeautifulSoup(str(step4[0].find('td',
+                                             attrs={'data-stat':'pass_yds'})),'html.parser').string
+        off_rush_yds = bs4.BeautifulSoup(str(step4[0].find('td',
+                                             attrs={'data-stat':'rush_yds'})),'html.parser').string
+        off_ypp = bs4.BeautifulSoup(str(step4[0].find('td',
+                                        attrs={'data-stat':'tot_yds_per_play'})),'html.parser').string
+        off_pen_yds = bs4.BeautifulSoup(str(step4[0].find('td',
+                                            attrs={'data-stat':'penalty_yds'})),'html.parser').string
+        off_turnovers = bs4.BeautifulSoup(str(step4[0].find('td',
+                                              attrs={'data-stat':'turnovers'})),'html.parser').string
+        def_pass_yds = bs4.BeautifulSoup(str(step4[1].find('td',
+                                             attrs={'data-stat':'opp_pass_yds'})),'html.parser').string
+        def_rush_yds = bs4.BeautifulSoup(str(step4[1].find('td',
+                                             attrs={'data-stat':'opp_rush_yds'})),'html.parser').string
+        def_ypp = bs4.BeautifulSoup(str(step4[1].find('td',
+                                        attrs={'data-stat':'opp_tot_yds_per_play'})),'html.parser').string
+        def_pen_yds = bs4.BeautifulSoup(str(step4[1].find('td',
+                                            attrs={'data-stat':'opp_penalty_yds'})),'html.parser').string
+        def_turnovers = bs4.BeautifulSoup(str(step4[1].find('td',
+                                              attrs={'data-stat':'opp_turnovers'})),'html.parser').string
         toAppend = {
                 name:{
                 'link':link,
@@ -83,24 +95,32 @@ resultsData = {}
 
 for i in range(0,len(step2)):
     try:
-        team1 = bs4.BeautifulSoup(str(step2[i].find('td', attrs={'data-stat':'winner_school_name'})),'html.parser').find('a').string
+        team1 = bs4.BeautifulSoup(str(step2[i].find('td', 
+                                      attrs={'data-stat':'winner_school_name'})),'html.parser').find('a').string
     except:
-        team1 = bs4.BeautifulSoup(str(step2[i].find('td', attrs={'data-stat':'winner_school_name'})),'html.parser').string
-    team1Score = bs4.BeautifulSoup(str(step2[i].find('td', attrs={'data-stat':'winner_points'})),'html.parser').string
+        team1 = bs4.BeautifulSoup(str(step2[i].find('td',
+                                      attrs={'data-stat':'winner_school_name'})),'html.parser').string
+    team1Score = bs4.BeautifulSoup(str(step2[i].find('td',
+                                       attrs={'data-stat':'winner_points'})),'html.parser').string
     if team1Score is None:
         print('done.')
         break
     
-    if bs4.BeautifulSoup(str(step2[i].find('td', attrs={'data-stat':'game_location'})),'html.parser').string == "@":
+    if bs4.BeautifulSoup(str(step2[i].find('td',
+                             attrs={'data-stat':'game_location'})),'html.parser').string == "@":
         team1Home = False
     else:
         team1Home = True
     try:
-        team2 = bs4.BeautifulSoup(str(step2[i].find('td', attrs={'data-stat':'loser_school_name'})),'html.parser').find('a').string
+        team2 = bs4.BeautifulSoup(str(step2[i].find('td',
+                                      attrs={'data-stat':'loser_school_name'})),'html.parser').find('a').string
     except:
-        team2 = bs4.BeautifulSoup(str(step2[i].find('td', attrs={'data-stat':'loser_school_name'})),'html.parser').string
-    team2Score = bs4.BeautifulSoup(str(step2[i].find('td', attrs={'data-stat':'loser_points'})),'html.parser').string
-    week = 'week-'+bs4.BeautifulSoup(str(step2[i].find('td', attrs={'data-stat':'week_number'})),'html.parser').string
+        team2 = bs4.BeautifulSoup(str(step2[i].find('td',
+                                      attrs={'data-stat':'loser_school_name'})),'html.parser').string
+    team2Score = bs4.BeautifulSoup(str(step2[i].find('td',
+                                       attrs={'data-stat':'loser_points'})),'html.parser').string
+    week = 'week-'+bs4.BeautifulSoup(str(step2[i].find('td',
+                                         attrs={'data-stat':'week_number'})),'html.parser').string
     results = {
             week:
                 {

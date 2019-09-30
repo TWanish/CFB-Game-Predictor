@@ -12,7 +12,7 @@ soup = bs4.BeautifulSoup(html, 'html.parser')
 step1 = soup.find('table', attrs={'id':'schools'})
 step2 = bs4.BeautifulSoup(str(step1.findAll('tbody')),'html.parser').findAll('tr')
 
-teamData = []
+teamData = {}
 
 for i in range(0,len(step2)):
     year = bs4.BeautifulSoup(str(step2[i].find('td', attrs={'data-stat':'year_max'})),'html.parser').string
@@ -56,7 +56,7 @@ for i in range(0,len(step2)):
         def_pen_yds = bs4.BeautifulSoup(str(step4[1].find('td', attrs={'data-stat':'opp_penalty_yds'})),'html.parser').string
         def_turnovers = bs4.BeautifulSoup(str(step4[1].find('td', attrs={'data-stat':'opp_turnovers'})),'html.parser').string
         toAppend = {
-                'school': name,
+                name:{
                 'link':link,
                 'ptsF':ptsF,
                 'ptsA':ptsA,
@@ -73,7 +73,8 @@ for i in range(0,len(step2)):
                 'def_pen_yds':def_pen_yds,
                 'def_turnovers':def_turnovers
                 }
-        teamData.append(toAppend)
+                }
+        teamData.update(toAppend)
     
 with open('teamData.json', 'w') as outfile:
     json.dump(teamData, outfile)

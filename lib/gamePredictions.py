@@ -49,7 +49,12 @@ def predictGame(team1, team2, model, data):
         team2History.append(int(team2Pts))
         if int(team1Pts)>int(team2Pts):
             winCount = winCount + 1
-    print(team1 + ': ' + str(np.mean(team1History)))
-    print(team2 + ': ' + str(np.mean(team2History)))
-    print('Win percentage: ' + str(winCount))
-    return
+    #print(team1 + ': ' + str(np.mean(team1History)))
+    #print(team2 + ': ' + str(np.mean(team2History)))
+    #print('Win percentage: ' + str(winCount))
+    
+    if np.mean(team1History)>np.mean(team2History):
+        winningTeam = team1
+    else:
+        winningTeam = team2
+    return winningTeam

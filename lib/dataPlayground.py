@@ -13,6 +13,7 @@ import numpy as np
 import os
 from modelGeneration import getModel, getMLDF
 from gamePredictions import predictGame
+from rankingGenerator import createRankings
 
 try:
     path = os.path.normpath(str(os.getcwd()).split('lib')[0]+'/data/teamData.json')
@@ -22,4 +23,8 @@ data = pd.read_json(path).drop(['link'])
     
 model = getModel(data)
 
-predictGame('Auburn', 'Florida', model, data)
+#predictGame('Clemson', 'Auburn', model, data)
+
+rankings = createRankings(data.columns.values, 0, 
+                               len(data.columns.values)-1, 
+                               model, data)[::-1][0:25]

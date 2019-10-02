@@ -11,7 +11,7 @@ Collection of functions for actually predicting games
 import pandas as pd
 import numpy as np
 
-def predictGame(team1, team2, model, data):
+def predictGame(team1, team2, model, data, output):
     team1History = []
     team2History = []
     winCount = 0
@@ -49,9 +49,10 @@ def predictGame(team1, team2, model, data):
         team2History.append(int(team2Pts))
         if int(team1Pts)>int(team2Pts):
             winCount = winCount + 1
-    #print(team1 + ': ' + str(np.mean(team1History)))
-    #print(team2 + ': ' + str(np.mean(team2History)))
-    #print('Win percentage: ' + str(winCount))
+    if output is True:
+        print(team1 + ': ' + str(np.mean(team1History)))
+        print(team2 + ': ' + str(np.mean(team2History)))
+        print('Win percentage: ' + str(winCount))
     
     if np.mean(team1History)>np.mean(team2History):
         winningTeam = team1

@@ -9,10 +9,8 @@ Used for actually predicting games for the next week or adhoc game predictions
 """
 
 import pandas as pd
-import numpy as np
 import os
 from modelGeneration import getModel, getMLDF
-from gamePredictions import predictGame
 from rankingGenerator import createRankings
 
 try:

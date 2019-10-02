@@ -15,7 +15,7 @@ def partition(teams, low, high, model, data):
   
         # If current element is smaller than or 
         # equal to pivot 
-        if   predictGame(teams[j],pivot, model, data) is not teams[j]: 
+        if   predictGame(teams[j],pivot, model, data, False) is not teams[j]: 
           
             # increment index of smaller element 
             i = i+1 

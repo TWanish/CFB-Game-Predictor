@@ -10,6 +10,8 @@ Collection of functions for actually predicting games
 
 import pandas as pd
 import numpy as np
+import requests
+import bs4
 
 def predictGame(team1, team2, model, data, output):
     team1History = []
@@ -58,4 +60,75 @@ def predictGame(team1, team2, model, data, output):
         winningTeam = team1
     else:
         winningTeam = team2
-    return winningTeam
+        
+    gameSummary = {'Team 1': team1,
+                   'Team 1 Score': np.mean(team1History),
+                   'Team 2': team2,
+                   'Team 2 Score': np.mean(team2History),
+                   'Winning Percentage Team 1': winCount}
+    return gameSummary
+
+def predictNextWeek(model, data, week, output, file_path = None):
+    ## Getting Schedule Results
+    url='https://www.sports-reference.com/cfb/years/2019-schedule.html'
+    res = requests.get(url)
+    html = res.content
+    soup = bs4.BeautifulSoup(html, 'html.parser')
+    step1 = soup.find('table', attrs={'id':'schedule'})
+    step2 = bs4.BeautifulSoup(str(step1.findAll('tbody')),'html.parser').findAll('tr')
+    dataDict = data.to_dict()
+    
+    for i in range(0,len(step2)):
+        if str(week) == bs4.BeautifulSoup(str(step2[i].find('td',
+                                             attrs={'data-stat':'week_number'})),'html.parser').string:
+            try:
+                team1 = bs4.BeautifulSoup(str(step2[i].find('td', 
+                                              attrs={'data-stat':'winner_school_name'})),'html.parser').find('a').string
+            except:
+                team1 = bs4.BeautifulSoup(str(step2[i].find('td',
+                                              attrs={'data-stat':'winner_school_name'})),'html.parser').string
+            try:
+                team2 = bs4.BeautifulSoup(str(step2[i].find('td',
+                                              attrs={'data-stat':'loser_school_name'})),'html.parser').find('a').string
+            except:
+                team2 = bs4.BeautifulSoup(str(step2[i].find('td',
+                                              attrs={'data-stat':'loser_school_name'})),'html.parser').string
+            try:
+                gameSummary = predictGame(team1, team2, model, data, False)
+                team1Score = gameSummary['Team 1 Score']
+                team2Score = gameSummary['Team 2 Score']
+                team1WP = gameSummary['Winning Percentage Team 1']
+                results = {
+                        'week-'+str(week):
+                            {
+                                'predictions':
+                                    {
+                                        'team-1':team1,
+                                        'team-1-score':team1Score,
+                                        'team-2':team2,
+                                        'team-2-score':team2Score,
+                                        'team-1-win-chance':team1WP
+                                    }
+                            }
+                        }
+                if output is True:
+                    print(results)
+            except KeyError:
+                continue
+            
+            try:
+                dataDict[team1].update(results)
+            except:
+                pass
+            try:
+                dataDict[team2].update(results)
+            except:
+                pass
+            
+    data = pd.DataFrame.from_dict(dataDict)
+    
+    if file_path is not None:
+        print('saving...')
+        data.to_json(file_path)
+        
+    return data

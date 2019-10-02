@@ -20,6 +20,7 @@ import matplotlib.pyplot as plt
 
 def getModel(data):
     ## General Stat Fitting
+    data = data.drop(['link'])
     var_list = {}
     for x_var in ['off_pass_yds', 'off_pen_yds', 'off_rush_ypa', 'off_turnovers', 
                   'off_ypp', 'off_firstDown']:
@@ -103,6 +104,7 @@ def getModel(data):
     return final_model
 
 def getMLDF(data):
+    data = data.drop(['link'])
     off_ypp = []
     off_turnovers = []
     off_rush_ypa = []

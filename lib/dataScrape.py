@@ -1,4 +1,4 @@
-import requests, bs4, json
+import requests, bs4, json, os
 
 url='https://www.sports-reference.com/cfb/schools/'
 res = requests.get(url)
@@ -146,8 +146,8 @@ for i in range(0,len(step2)):
     except:
         pass
     
-
+path = os.path.normpath(str(os.getcwd()).split('lib')[0]+'/data/teamData.json')
     
-with open('teamData.json', 'w') as outfile:
+with open(path, 'w') as outfile:
     json.dump(teamData, outfile)
 

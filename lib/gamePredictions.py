@@ -14,6 +14,21 @@ import requests
 import bs4
 
 def predictGame(team1, team2, model, data, output):
+    
+    if team1 in data.columns.values:
+        pass
+    else:
+        for team in data.columns.values:
+            if team1 in data.loc['alias',team]:
+                team1 = team
+                
+    if team2 in data.columns.values:
+        pass
+    else:
+        for team in data.columns.values:
+            if team2 in data.loc['alias',team]:
+                team2 = team
+                    
     team1History = []
     team2History = []
     winCount = 0
@@ -72,7 +87,7 @@ def predictGame(team1, team2, model, data, output):
     return gameSummary
 
 def predictNextWeek(model, data, week, output, file_path = None):
-    ## Getting Schedule Results
+    ## Getting Schedule Results            
     url='https://www.sports-reference.com/cfb/years/2019-schedule.html'
     res = requests.get(url)
     html = res.content
@@ -98,6 +113,8 @@ def predictNextWeek(model, data, week, output, file_path = None):
                                               attrs={'data-stat':'loser_school_name'})),'html.parser').string
             try:
                 gameSummary = predictGame(team1, team2, model, data, False)
+                team1 = gameSummary['Team 1'] # Overwriting team 1 value if an alias was used
+                team2 = gameSummary['Team 2']
                 team1Score = gameSummary['Team 1 Score']
                 team2Score = gameSummary['Team 2 Score']
                 team1WP = gameSummary['Winning Percentage Team 1']

@@ -21,7 +21,7 @@ def predictGame(team1, team2, model, data, output):
         normalizer=0
         for var in model.keys():
             if var is not 'srs':
-                normalizer += np.sqrt(model[var]['r_sq'])
+                normalizer += np.sqrt(model[var]['r_sq']) # r instead of r^2
         team1Pts = 0
         team2Pts = 0
         for var in model.keys():
@@ -32,7 +32,9 @@ def predictGame(team1, team2, model, data, output):
                 team1Pts += srs_margin*model[var]['m']/1.4
                 team2Pts -= srs_margin*model[var]['m']/1.4
             elif var.split('_')[0] == 'off':
-                multiplier = np.sqrt(model[var]['r_sq'])/normalizer
+                multiplier = np.sqrt(model[var]['r_sq'])/normalizer #specific r / sum of all rs
+                
+                #pts = sum((variable value w/ 3*stdev*r)*coef*(r/sum(r))+intercept*(r/sum(r)))
                 team1Pts += np.random.normal(float(data.loc[var,team1]),model[var]['std']*3\
                                              *np.sqrt(model[var]['r_sq']))*model[var]['m']\
                                              *multiplier+model[var]['b']*multiplier
@@ -51,6 +53,7 @@ def predictGame(team1, team2, model, data, output):
         team2History.append(int(team2Pts))
         if int(team1Pts)>int(team2Pts):
             winCount = winCount + 1
+            
     if output is True:
         print(team1 + ': ' + str(np.mean(team1History)))
         print(team2 + ': ' + str(np.mean(team2History)))
@@ -111,8 +114,10 @@ def predictNextWeek(model, data, week, output, file_path = None):
                                     }
                             }
                         }
+                                    
                 if output is True:
                     print(results)
+                    
             except KeyError:
                 continue
             

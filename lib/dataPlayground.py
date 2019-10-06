@@ -26,8 +26,8 @@ model = getModel(data)
 
 #predictGame('Clemson', 'Auburn', model, data)
 
-#rankings = createRankings(data.columns.values, 0, 
-#                               len(data.columns.values)-1, 
-#                               model, data)[::-1]
-
-predictNextWeek(model, data, 7, False, file_path = path)
+rankings = createRankings(data.columns.values, 0, 
+                               len(data.columns.values)-1, 
+                               model, data)[::-1]
+print(rankings[0:25])
+predictNextWeek(model, data, 8, False, file_path = path)

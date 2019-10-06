@@ -83,7 +83,8 @@ def predictGame(team1, team2, model, data, output):
                    'Team 1 Score': np.mean(team1History),
                    'Team 2': team2,
                    'Team 2 Score': np.mean(team2History),
-                   'Winning Percentage Team 1': winCount}
+                   'Winning Percentage Team 1': winCount,
+                   'Winning Team': winningTeam}
     return gameSummary
 
 def predictNextWeek(model, data, week, output, file_path = None):
@@ -95,6 +96,7 @@ def predictNextWeek(model, data, week, output, file_path = None):
     step1 = soup.find('table', attrs={'id':'schedule'})
     step2 = bs4.BeautifulSoup(str(step1.findAll('tbody')),'html.parser').findAll('tr')
     dataDict = data.to_dict()
+    weekName = 'week-'+str(week)
     
     for i in range(0,len(step2)):
         if str(week) == bs4.BeautifulSoup(str(step2[i].find('td',
@@ -119,18 +121,15 @@ def predictNextWeek(model, data, week, output, file_path = None):
                 team2Score = gameSummary['Team 2 Score']
                 team1WP = gameSummary['Winning Percentage Team 1']
                 results = {
-                        'week-'+str(week):
-                            {
-                                'predictions':
-                                    {
-                                        'team-1':team1,
-                                        'team-1-score':team1Score,
-                                        'team-2':team2,
-                                        'team-2-score':team2Score,
-                                        'team-1-win-chance':team1WP
-                                    }
+                            'predictions':
+                                {
+                                    'team-1':team1,
+                                    'team-1-score':team1Score,
+                                    'team-2':team2,
+                                    'team-2-score':team2Score,
+                                    'team-1-win-chance':team1WP
+                                }
                             }
-                        }
                                     
                 if output is True:
                     print(results)
@@ -139,13 +138,19 @@ def predictNextWeek(model, data, week, output, file_path = None):
                 continue
             
             try:
-                dataDict[team1].update(results)
-            except:
-                pass
+                dataDict[team1][weekName].update(results)
+            except KeyError:
+                try:
+                    dataDict[team1][weekName] = results
+                except KeyError:
+                    pass
             try:
-                dataDict[team2].update(results)
-            except:
-                pass
+                dataDict[team2][weekName].update(results)
+            except KeyError:
+                try:
+                    dataDict[team2][weekName] = results
+                except KeyError:
+                    pass
             
     data = pd.DataFrame.from_dict(dataDict)
     

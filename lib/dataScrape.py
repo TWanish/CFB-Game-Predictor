@@ -1,4 +1,8 @@
-import requests, bs4, json, os
+import requests
+import bs4
+import json
+import os
+import pandas as pd
 
 def updateSchoolInfo(teamData, link, name = None):
     res = requests.get(link)
@@ -80,6 +84,7 @@ def updateSchoolInfo(teamData, link, name = None):
     return
 
 path = os.path.normpath(str(os.getcwd()).split('lib')[0]+'/data/teamData.json')
+print(path)
 
 teamData = {}
 
@@ -87,7 +92,7 @@ try:
     data = pd.read_json(path)
     teamData = data.to_dict()
     print('Found Existing Data File')
-    for school in teamData.keys():
+    for school in list(teamData.keys()):
         updateSchoolInfo(teamData, teamData[school]['link'])
         print('Updating ' + school)
     
@@ -132,8 +137,10 @@ for i in range(0,len(step2)):
         team1 = bs4.BeautifulSoup(str(step2[i].find('td',
                                       attrs={'data-stat':'winner_school_name'})),'html.parser').string
     try:
-        'winning-score' in teamData[team1][week].keys()
-        continue
+        if 'winning-score' in teamData[team1][week].keys():
+            continue
+        else:
+            raise ValueError('Not present for '+ week)
     except:
         team1Score = bs4.BeautifulSoup(str(step2[i].find('td',
                                            attrs={'data-stat':'winner_points'})),'html.parser').string
@@ -166,20 +173,25 @@ for i in range(0,len(step2)):
                     }
                 }
         try:
-            teamData[team1].update(results)
+            existingWeek = teamData[team1][week]
+        except:
+            existingWeek = {}
+        existingWeek.update(results)
+        try:
+            teamData[team1].update(existingWeek)
         except:
             for team in teamData.keys():
                 if team1 in teamData[team]['alias']:
                     team1 = team
-                    teamData[team1].update(results)
+                    teamData[team1].update(existingWeek)
                     break
         try:
-            teamData[team2].update(results)
+            teamData[team2].update(existingWeek)
         except:
             for team in teamData.keys():
                 if team2 in teamData[team]['alias']:
                     team2 = team
-                    teamData[team2].update(results)
+                    teamData[team2].update(existingWeek)
                     break
     
 with open(path, 'w') as outfile:

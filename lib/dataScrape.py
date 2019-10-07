@@ -77,7 +77,7 @@ try:
     
 except:
     print('Existing data file not found')
-    url='https://www.sports-reference.com/cfb/schools/'
+    url = 'https://www.sports-reference.com/cfb/schools/'
     res = requests.get(url)
     html = res.content
     soup = bs4.BeautifulSoup(html, 'html.parser')
@@ -97,7 +97,7 @@ except:
         
 ## Getting Schedule Results
 print('Updating Schedule Results...')
-url='https://www.sports-reference.com/cfb/years/2019-schedule.html'
+url = 'https://www.sports-reference.com/cfb/years/2019-schedule.html'
 res = requests.get(url)
 html = res.content
 soup = bs4.BeautifulSoup(html, 'html.parser')

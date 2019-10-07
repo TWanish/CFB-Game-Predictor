@@ -97,7 +97,7 @@ def getModel(data):
     ## Pick out useful variables and build a model
     util_vars = []
     for var in var_list:
-        if var_list[var]['r_sq']>0.20:
+        if var_list[var]['r_sq']>0.225: # Marker for significance, increase as season progresses (start at .10, finish at .35)
             util_vars.append(var)
             var_list[var]['mean']=data.loc[var].astype(float).values.mean()
             var_list[var]['std']=data.loc[var].astype(float).values.std()
@@ -106,85 +106,3 @@ def getModel(data):
         final_model[var]=var_list[var]
     return final_model
 
-def getMLDF(data):
-    data = data.drop(['link'])
-    off_ypp = []
-    off_turnovers = []
-    off_rush_ypa = []
-    off_pen_yds = []
-    off_pass_yds = []
-    off_firstDown = []
-    off_srs = []
-    def_ypp = []
-    def_turnovers = []
-    def_rush_ypa = []
-    def_pen_yds = []
-    def_pass_yds = []
-    def_firstDown = []
-    def_srs = []
-    ptsF =[]
-    columns = ['off_ypp', 'off_turnovers', 'off_rush_ypa', 'off_pen_yds', 
-               'off_pass_yds', 'off_firstDown', 'off_srs', 'def_ypp', 'def_turnovers',
-               'def_rush_yds', 'def_pen_yds', 'def_pass_yds', 'def_firstDown',
-               'def_srs', 'ptsF']
-    for team in data.columns.values:
-        for i in range(0,len(data[team].values)):
-            team_week = data[team].values[i]
-            if type(team_week) is dict:
-                try:
-                    win_team = team_week['winning-team']
-                    off_ypp.append(float(data.loc['off_ypp',win_team]))
-                    off_turnovers.append(float(data.loc['off_turnovers',win_team]))
-                    off_rush_ypa.append(float(data.loc['off_rush_ypa',win_team]))
-                    off_pen_yds.append(float(data.loc['off_pen_yds',win_team]))
-                    off_pass_yds.append(float(data.loc['off_pass_yds',win_team]))
-                    off_firstDown.append(float(data.loc['off_firstDown',win_team]))
-                    off_srs.append(float(data.loc['srs',win_team]))
-                    lose_team = team_week['losing-team']
-                    def_ypp.append(float(data.loc['def_ypp',lose_team]))
-                    def_turnovers.append(float(data.loc['def_turnovers',lose_team]))
-                    def_rush_ypa.append(float(data.loc['def_rush_ypa',lose_team]))
-                    def_pen_yds.append(float(data.loc['def_pen_yds',lose_team]))
-                    def_pass_yds.append(float(data.loc['def_pass_yds',lose_team]))
-                    def_firstDown.append(float(data.loc['def_firstDown',lose_team]))
-                    def_srs.append(float(data.loc['srs',lose_team]))
-                    ptsF.append(float(team_week['winning-score']))
-                    
-                    off_ypp.append(float(data.loc['off_ypp',lose_team]))
-                    off_turnovers.append(float(data.loc['off_turnovers',lose_team]))
-                    off_rush_ypa.append(float(data.loc['off_rush_ypa',lose_team]))
-                    off_pen_yds.append(float(data.loc['off_pen_yds',lose_team]))
-                    off_pass_yds.append(float(data.loc['off_pass_yds',lose_team]))
-                    off_firstDown.append(float(data.loc['off_firstDown',lose_team]))
-                    off_srs.append(float(data.loc['srs',lose_team]))
-                    def_ypp.append(float(data.loc['def_ypp',win_team]))
-                    def_turnovers.append(float(data.loc['def_turnovers',win_team]))
-                    def_rush_ypa.append(float(data.loc['def_rush_ypa',win_team]))
-                    def_pen_yds.append(float(data.loc['def_pen_yds',win_team]))
-                    def_pass_yds.append(float(data.loc['def_pass_yds',win_team]))
-                    def_firstDown.append(float(data.loc['def_firstDown',win_team]))
-                    def_srs.append(float(data.loc['srs',win_team]))
-                    ptsF.append(float(team_week['losing-score']))
-
-                except:
-                    continue
-                
-    df = pd.DataFrame(list(zip(off_ypp, off_turnovers, off_rush_ypa, 
-                               off_pen_yds, off_pass_yds, off_firstDown, off_srs,
-                               def_ypp, def_turnovers, def_rush_ypa, def_pen_yds,
-                               def_pass_yds, def_firstDown, def_srs, 
-                               ptsF)), columns=columns)
-    X = df.drop(['ptsF'], axis=1)
-    y = df['ptsF'].values
-    scaler = StandardScaler()
-    X_scaled = scaler.fit_transform(X)
-
-    #----Reducing remaining variables into 2
-    LDA = LinearDiscriminantAnalysis(n_components=5, shrinkage='auto', solver='eigen')
-    LDA_reduced_df = LDA.fit(X_scaled,y).transform(X_scaled)
-    print(LDA_reduced_df)
-    classifier = RFC(n_estimators = 100, n_jobs = -1)
-    X_train, X_test, y_train, y_test = tts(LDA_reduced_df,y,test_size = 0.2)
-    classifier=classifier.fit(X_train, y_train)
-    print(classifier.score(X_test, y_test))
-    return 

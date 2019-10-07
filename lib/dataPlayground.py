@@ -10,7 +10,7 @@ Used for actually predicting games for the next week or adhoc game predictions
 
 import pandas as pd
 import os
-from modelGeneration import getModel, getMLDF
+from modelGeneration import getModel
 from rankingGenerator import createRankings
 from gamePredictions import predictNextWeek
 

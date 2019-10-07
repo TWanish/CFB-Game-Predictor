@@ -24,8 +24,7 @@ data = pd.read_json(path)
     
 model = getModel(data)
 
-#predictGame('Clemson', 'Auburn', model, data)
-
+print('Generating rankings...')
 rankings = createRankings(data.columns.values, 0, 
                                len(data.columns.values)-1, 
                                model, data)[::-1]

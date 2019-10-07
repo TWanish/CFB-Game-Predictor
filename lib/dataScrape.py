@@ -31,33 +31,6 @@ def updateSchoolInfo(teamData, link, name = None):
         ptsA = step[6].getText().split(' ')[2]
         srs = step[7].getText().split(' ')[1]
         sos = step[8].getText().split(' ')[1]
-    ## Summary Data (Off Rush yards, Pass Yards, YPP, Penalties, TO)
-    step = soup.find('table', attrs={'id':'team'})
-    step2 = bs4.BeautifulSoup(str(step.findAll('tbody')),'html.parser').findAll('tr')
-    off_pass_yds = bs4.BeautifulSoup(str(step2[0].find('td',
-                                         attrs={'data-stat':'pass_yds'})),'html.parser').string
-    off_rush_ypa = bs4.BeautifulSoup(str(step2[0].find('td',
-                                         attrs={'data-stat':'rush_yds_per_att'})),'html.parser').string
-    off_ypp = bs4.BeautifulSoup(str(step2[0].find('td',
-                                    attrs={'data-stat':'tot_yds_per_play'})),'html.parser').string
-    off_firstDown = bs4.BeautifulSoup(str(step2[0].find('td',
-                                    attrs={'data-stat':'first_down'})),'html.parser').string
-    off_pen_yds = bs4.BeautifulSoup(str(step2[0].find('td',
-                                        attrs={'data-stat':'penalty_yds'})),'html.parser').string
-    off_turnovers = bs4.BeautifulSoup(str(step2[0].find('td',
-                                          attrs={'data-stat':'turnovers'})),'html.parser').string
-    def_pass_yds = bs4.BeautifulSoup(str(step2[1].find('td',
-                                         attrs={'data-stat':'opp_pass_yds'})),'html.parser').string
-    def_rush_ypa = bs4.BeautifulSoup(str(step2[1].find('td',
-                                         attrs={'data-stat':'opp_rush_yds_per_att'})),'html.parser').string
-    def_ypp = bs4.BeautifulSoup(str(step2[1].find('td',
-                                    attrs={'data-stat':'opp_tot_yds_per_play'})),'html.parser').string
-    def_firstDown = bs4.BeautifulSoup(str(step2[1].find('td',
-                                    attrs={'data-stat':'opp_first_down'})),'html.parser').string
-    def_pen_yds = bs4.BeautifulSoup(str(step2[1].find('td',
-                                        attrs={'data-stat':'opp_penalty_yds'})),'html.parser').string
-    def_turnovers = bs4.BeautifulSoup(str(step2[1].find('td',
-                                          attrs={'data-stat':'opp_turnovers'})),'html.parser').string
     toAppend = {
             name:{
             'alias':alias,
@@ -66,20 +39,26 @@ def updateSchoolInfo(teamData, link, name = None):
             'ptsA':ptsA,
             'srs':srs,
             'sos':sos,
-            'off_pass_yds':off_pass_yds,
-            'off_rush_ypa':off_rush_ypa,
-            'off_ypp':off_ypp,
-            'off_firstDown':off_firstDown,
-            'off_pen_yds':off_pen_yds,
-            'off_turnovers':off_turnovers,
-            'def_pass_yds':def_pass_yds,
-            'def_rush_ypa':def_rush_ypa,
-            'def_ypp':def_ypp,
-            'def_firstDown':def_firstDown,
-            'def_pen_yds':def_pen_yds,
-            'def_turnovers':def_turnovers
-                }
-            }
+                 }
+               }
+    ## Summary Data (Off Rush yards, Pass Yards, YPP, Penalties, TO)
+    step = soup.find('table', attrs={'id':'team'})
+    step2 = bs4.BeautifulSoup(str(step.findAll('tbody')),'html.parser').findAll('tr')
+    offensiveStats = step2[0].findAll('td')
+    defensiveStats = step2[1].findAll('td')
+    ## Offensive Stats
+    for i in range(0,len(offensiveStats)):
+        stat = offensiveStats[i]['data-stat']
+        if stat == 'g':
+            continue
+        value = offensiveStats[i].getText()
+        toAppend[name].update({'off_'+stat:value})
+    for j in range(0,len(defensiveStats)):
+        stat = defensiveStats[j]['data-stat']
+        if stat == 'g':
+            continue
+        value = defensiveStats[j].getText()
+        toAppend[name].update({'def_'+stat:value})
     teamData.update(toAppend)
     return
 

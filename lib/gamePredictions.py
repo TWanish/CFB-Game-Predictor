@@ -32,7 +32,7 @@ def predictGame(team1, team2, model, data, output):
     team1History = []
     team2History = []
     winCount = 0
-    for i in range(0,100):
+    for i in range(0,1000):
         normalizer=0
         for var in model.keys():
             if var is not 'srs':
@@ -50,18 +50,18 @@ def predictGame(team1, team2, model, data, output):
                 multiplier = np.sqrt(model[var]['r_sq'])/normalizer #specific r / sum of all rs
                 
                 #pts = sum((variable value w/ 3*stdev*r)*coef*(r/sum(r))+intercept*(r/sum(r)))
-                team1Pts += np.random.normal(float(data.loc[var,team1]),model[var]['std']*3\
+                team1Pts += np.random.normal(float(data.loc[var,team1]),model[var]['std']*6\
                                              *np.sqrt(model[var]['r_sq']))*model[var]['m']\
                                              *multiplier+model[var]['b']*multiplier
-                team2Pts += np.random.normal(float(data.loc[var,team2]),model[var]['std']*3\
+                team2Pts += np.random.normal(float(data.loc[var,team2]),model[var]['std']*6\
                                              *np.sqrt(model[var]['r_sq']))*model[var]['m']\
                                              *multiplier+model[var]['b']*multiplier
             else:
                 multiplier = np.sqrt(model[var]['r_sq'])/normalizer
-                team1Pts += np.random.normal(float(data.loc[var,team2]),model[var]['std']*3\
+                team1Pts += np.random.normal(float(data.loc[var,team2]),model[var]['std']*6\
                                              *np.sqrt(model[var]['r_sq']))*model[var]['m']\
                                              *multiplier+model[var]['b']*multiplier
-                team2Pts += np.random.normal(float(data.loc[var,team1]),model[var]['std']*3\
+                team2Pts += np.random.normal(float(data.loc[var,team1]),model[var]['std']*6\
                                              *np.sqrt(model[var]['r_sq']))*model[var]['m']\
                                              *multiplier+model[var]['b']*multiplier
         team1History.append(int(team1Pts))
@@ -72,7 +72,7 @@ def predictGame(team1, team2, model, data, output):
     if output is True:
         print(team1 + ': ' + str(np.mean(team1History)))
         print(team2 + ': ' + str(np.mean(team2History)))
-        print('Win percentage: ' + str(winCount))
+        print('Win percentage: ' + str(winCount/10))
     
     if np.mean(team1History)>np.mean(team2History):
         winningTeam = team1
@@ -83,8 +83,9 @@ def predictGame(team1, team2, model, data, output):
                    'Team 1 Score': np.mean(team1History),
                    'Team 2': team2,
                    'Team 2 Score': np.mean(team2History),
-                   'Winning Percentage Team 1': winCount,
-                   'Winning Team': winningTeam}
+                   'Winning Percentage Team 1': winCount/10,
+                   'Winning Team': winningTeam,
+                   'Spread': round(2*(np.mean(team1History)-np.mean(team2History)))/2.0}
     return gameSummary
 
 def predictNextWeek(model, data, week, output, file_path = None):
@@ -120,6 +121,7 @@ def predictNextWeek(model, data, week, output, file_path = None):
                 team1Score = gameSummary['Team 1 Score']
                 team2Score = gameSummary['Team 2 Score']
                 team1WP = gameSummary['Winning Percentage Team 1']
+                spread = gameSummary['Spread']
                 results = {
                             'predictions':
                                 {
@@ -127,7 +129,8 @@ def predictNextWeek(model, data, week, output, file_path = None):
                                     'team-1-score':team1Score,
                                     'team-2':team2,
                                     'team-2-score':team2Score,
-                                    'team-1-win-chance':team1WP
+                                    'team-1-win-chance':team1WP,
+                                    'spread':spread
                                 }
                             }
                                     

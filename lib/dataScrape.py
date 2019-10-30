@@ -153,6 +153,8 @@ for i in range(0,len(step2)):
                 }
         try:
             existingWeek = teamData[team1][week]
+            if existingWeek is None:
+                existingWeek = {}
         except:
             existingWeek = {}
         existingWeek.update(results)

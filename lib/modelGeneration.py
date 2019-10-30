@@ -97,7 +97,7 @@ def getModel(data):
     ## Pick out useful variables and build a model
     util_vars = []
     for var in var_list:
-        if var_list[var]['r_sq']>0.225: # Marker for significance, increase as season progresses (start at .10, finish at .35)
+        if var_list[var]['r_sq']>0.275: # Marker for significance, increase as season progresses (start at .10, finish at .35)
             util_vars.append(var)
             var_list[var]['mean']=data.loc[var].astype(float).values.mean()
             var_list[var]['std']=data.loc[var].astype(float).values.std()

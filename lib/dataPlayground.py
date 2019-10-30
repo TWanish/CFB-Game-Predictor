@@ -29,4 +29,4 @@ rankings = createRankings(data.columns.values, 0,
                                len(data.columns.values)-1, 
                                model, data)[::-1]
 print(rankings[0:25])
-predictNextWeek(model, data, 8, False, file_path = path)
+predictNextWeek(model, data, 11, False, file_path = path)
